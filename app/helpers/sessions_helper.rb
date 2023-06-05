@@ -2,6 +2,9 @@ module SessionsHelper
      # Logs in the given user.
   def log_in(user)
     session[:user_id] = user.id
+     # Guard against session replay attacks.
+    # See https://bit.ly/33UvK0w for more.
+    session[:session_token] = user.session_token
   end
   
    # Remembers a user in a persistent session.
@@ -15,7 +18,7 @@ module SessionsHelper
   def current_user
     if (user_id = session[:user_id])
       @current_user ||= User.find_by(id: user_id)
-    elsif (user_id = cookies.encrypted[:user_id])
+    elsif (user_id = cookies.encrypted[:user_id])    # The tests still pass, so this branch is currently untested.
       user = User.find_by(id: user_id)
       if user && user.authenticated?(cookies[:remember_token])
         log_in user

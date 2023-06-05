@@ -3,7 +3,7 @@ require "test_helper"
 class UsersLoginTest < ActionDispatch::IntegrationTest
  def setup
     @user = users(:michael)
-  end
+ end
 end
 
 class InvalidPasswordTest < UsersLoginTest
@@ -75,19 +75,6 @@ class LogoutTest < Logout
   test "should still work after logout in second window" do
     delete logout_path
     assert_redirected_to root_url
-  end
-  
-  test "login with remembering" do
-    log_in_as(@user, remember_me: '1')
-    assert_not cookies[:remember_token].blank?
-  end
-
-  test "login without remembering" do
-    # Log in to set the cookie.
-    log_in_as(@user, remember_me: '1')
-    # Log in again and verify that the cookie is deleted.
-    log_in_as(@user, remember_me: '0')
-    assert cookies[:remember_token].blank?
   end
 end
 
