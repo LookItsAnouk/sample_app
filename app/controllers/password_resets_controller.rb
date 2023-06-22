@@ -7,15 +7,16 @@ class PasswordResetsController < ApplicationController
   end
   
   def create
-  @user = User.find_by(email: params[:password_reset][:email].downcase)
-  if @user
-    @user.create_reset_digest
-    @user.send_password_reset_email
-    flash[:info] = "Email sent with password reset instructions"
-    redirect_to root_url
-  else
-    flash.now[:danger] = "Email address not found"
-    render 'new', status: :unprocessable_entity
+    @user = User.find_by(email: params[:password_reset][:email].downcase)
+    if @user
+      @user.create_reset_digest
+      @user.send_password_reset_email
+      flash[:info] = "Email sent with password reset instructions"
+      redirect_to root_url
+    else
+      flash.now[:danger] = "Email address not found"
+      render 'new', status: :unprocessable_entity
+    end
   end
 
   def edit
@@ -25,9 +26,9 @@ class PasswordResetsController < ApplicationController
     if params[:user][:password].empty?               # Case 3
       @user.errors.add(:password, "can't be empty")
       render 'edit', status: :unprocessable_entity
-    elsif @user.update(user_params)                  # Case 4
-      reset_session
+    elsif @user.update(user_params)       
       log_in @user
+      @user.update_attribute(:reset_digest, nil)
       flash[:success] = "Password has been reset."
       redirect_to @user
     else
@@ -60,7 +61,4 @@ class PasswordResetsController < ApplicationController
         redirect_to new_password_reset_url
       end
     end
-    
-  end 
-  
 end
